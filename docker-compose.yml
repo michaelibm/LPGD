@@ -1,0 +1,15 @@
+services:
+  lgpd-manager:
+    build: .
+    container_name: lgpd_manager
+    ports:
+      - "8811:8811"
+    volumes:
+      - lgpd_manager_data:/app/data
+    environment:
+      - LGPD_MANAGER_ADMIN_EMAIL=admin@local
+      - LGPD_MANAGER_ADMIN_SENHA=TrocarSenha123!
+    restart: unless-stopped
+
+volumes:
+  lgpd_manager_data:

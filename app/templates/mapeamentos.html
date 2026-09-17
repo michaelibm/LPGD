@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Mapeamento de Dados - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Mapeamento de Dados (ROPA)</h2>{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Novo mapeamento</h3>
+  <p style="color:var(--muted);font-size:13px;">Duvidas ao preencher? Use o <a href="/assistente">Assistente de IA</a> para sugestoes de base legal, dados sensiveis e riscos.</p>
+  <form method="post" action="/mapeamentos/novo">
+    <label>Processo</label>
+    <select name="processo_id">
+      <option value="">-- selecione --</option>
+      {% for p in processos %}
+      <option value="{{ p.id }}">{{ p.nome }}</option>
+      {% endfor %}
+    </select>
+    <label>Finalidade</label>
+    <select name="finalidade_id">
+      <option value="">-- selecione --</option>
+      {% for f in finalidades %}
+      <option value="{{ f.id }}">{{ f.nome }}</option>
+      {% endfor %}
+    </select>
+    <label>Dados pessoais coletados</label>
+    <textarea name="dados_coletados" rows="2" placeholder="Ex: nome, CPF, e-mail, telefone"></textarea>
+    <label><input type="checkbox" name="dados_sensiveis" style="width:auto;display:inline-block;margin-right:6px;"> Inclui dados sensiveis (saude, biometria, etnia, religiao, etc.)</label>
+    <label>Titulares dos dados</label>
+    <input type="text" name="titulares" placeholder="Ex: clientes, funcionarios">
+    <label>Origem do dado</label>
+    <input type="text" name="origem_dado" placeholder="Ex: formulario no site, atendimento presencial">
+    <label>Forma de coleta</label>
+    <input type="text" name="forma_coleta" placeholder="Ex: formulario online, papel, API">
+    <label>Onde e armazenado</label>
+    <input type="text" name="armazenamento" placeholder="Ex: banco de dados interno, planilha, nuvem">
+    <label>Tempo de retencao</label>
+    <input type="text" name="tempo_retencao" placeholder="Ex: 5 anos apos termino do contrato">
+    <label>Compartilhamento com terceiros</label>
+    <textarea name="compartilhamento" rows="2" placeholder="Com quem os dados sao compartilhados e por que"></textarea>
+    <label>Medidas de seguranca aplicadas</label>
+    <textarea name="medidas_seguranca" rows="2" placeholder="Ex: criptografia, controle de acesso, backups"></textarea>
+    <label>Base legal (LGPD)</label>
+    <input type="text" name="base_legal" placeholder="Ex: Execucao de contrato (art. 7, V)">
+    <button class="btn" type="submit">Salvar mapeamento</button>
+  </form>
+</div>
+<div class="card">
+  <h3>Mapeamentos cadastrados</h3>
+  <table>
+    <tr><th>ID</th><th>Processo</th><th>Dados coletados</th><th>Sensivel</th><th>Base legal</th></tr>
+    {% for m in itens %}
+    <tr>
+      <td>{{ m.id }}</td>
+      <td>{{ m.processo.nome if m.processo else "-" }}</td>
+      <td>{{ m.dados_coletados or "-" }}</td>
+      <td>{{ "Sim" if m.dados_sensiveis else "Nao" }}</td>
+      <td>{{ m.base_legal or "-" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" style="color:var(--muted)">Nenhum mapeamento cadastrado.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

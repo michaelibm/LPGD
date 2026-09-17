@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Terceiros - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Terceiros</h2>{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Novo terceiro</h3>
+  <form method="post" action="/terceiros/novo">
+    <label>Nome / Razao social</label>
+    <input type="text" name="nome" required>
+    <label>CNPJ / CPF</label>
+    <input type="text" name="cnpj_cpf">
+    <label>Tipo de relacao</label>
+    <input type="text" name="tipo_relacao" placeholder="Ex: fornecedor, operador de dados, parceiro">
+    <label>Dados compartilhados</label>
+    <textarea name="dados_compartilhados" rows="2"></textarea>
+    <label><input type="checkbox" name="contrato_dpa" style="width:auto;display:inline-block;margin-right:6px;"> Possui contrato/DPA de protecao de dados assinado</label>
+    <button class="btn" type="submit">Salvar</button>
+  </form>
+</div>
+<div class="card">
+  <h3>Terceiros cadastrados</h3>
+  <table>
+    <tr><th>ID</th><th>Nome</th><th>CNPJ/CPF</th><th>Tipo</th><th>DPA</th></tr>
+    {% for t in itens %}
+    <tr>
+      <td>{{ t.id }}</td>
+      <td>{{ t.nome }}</td>
+      <td>{{ t.cnpj_cpf or "-" }}</td>
+      <td>{{ t.tipo_relacao or "-" }}</td>
+      <td>{{ "Sim" if t.contrato_dpa else "Nao" }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" style="color:var(--muted)">Nenhum terceiro cadastrado.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

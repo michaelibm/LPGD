@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Login - LGPD Manager</title>
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: linear-gradient(135deg, #16241f, #1e8e5a);
+  }
+  .box {
+    background: #fff;
+    padding: 36px;
+    border-radius: 12px;
+    width: 340px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+  }
+  h1 { font-size: 20px; margin-bottom: 4px; color: #16241f; }
+  p.sub { color: #6b7280; font-size: 13px; margin-top: 0; margin-bottom: 20px; }
+  label { font-size: 13px; color: #6b7280; display: block; margin-bottom: 4px; }
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  button {
+    width: 100%;
+    background: #1e8e5a;
+    color: #fff;
+    border: none;
+    padding: 11px;
+    border-radius: 6px;
+    font-size: 15px;
+    cursor: pointer;
+  }
+  button:hover { background: #146b43; }
+  .erro { background: #fee2e2; color: #991b1b; padding: 8px 10px; border-radius: 6px; font-size: 13px; margin-bottom: 14px; }
+</style>
+</head>
+<body>
+  <div class="box">
+    <h1>LGPD Manager</h1>
+    <p class="sub">Gestao de conformidade com IA integrada</p>
+    {% if erro %}<div class="erro">{{ erro }}</div>{% endif %}
+    <form method="post" action="/login">
+      <label>E-mail</label>
+      <input type="email" name="email" required autofocus>
+      <label>Senha</label>
+      <input type="password" name="senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+  </div>
+</body>
+</html>

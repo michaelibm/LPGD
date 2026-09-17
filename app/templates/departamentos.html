@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Departamentos - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Departamentos</h2>{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Novo departamento</h3>
+  <form method="post" action="/departamentos/novo">
+    <label>Nome</label>
+    <input type="text" name="nome" required>
+    <label>Responsavel</label>
+    <input type="text" name="responsavel">
+    <label>Descricao</label>
+    <textarea name="descricao" rows="2"></textarea>
+    <button class="btn" type="submit">Salvar</button>
+  </form>
+</div>
+<div class="card">
+  <h3>Departamentos cadastrados</h3>
+  <table>
+    <tr><th>ID</th><th>Nome</th><th>Responsavel</th><th>Descricao</th></tr>
+    {% for d in itens %}
+    <tr><td>{{ d.id }}</td><td>{{ d.nome }}</td><td>{{ d.responsavel or "-" }}</td><td>{{ d.descricao or "-" }}</td></tr>
+    {% else %}
+    <tr><td colspan="4" style="color:var(--muted)">Nenhum departamento cadastrado.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

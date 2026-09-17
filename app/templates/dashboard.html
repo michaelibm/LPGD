@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Dashboard</h2>{% endblock %}
+{% block content %}
+<div class="grid-stats">
+  <div class="stat-card"><div class="num">{{ stats.departamentos }}</div><div class="label">Departamentos</div></div>
+  <div class="stat-card"><div class="num">{{ stats.processos }}</div><div class="label">Processos</div></div>
+  <div class="stat-card"><div class="num">{{ stats.mapeamentos }}</div><div class="label">Mapeamentos (ROPA)</div></div>
+  <div class="stat-card"><div class="num">{{ stats.riscos }}</div><div class="label">Riscos</div></div>
+  <div class="stat-card"><div class="num">{{ stats.terceiros }}</div><div class="label">Terceiros</div></div>
+  <div class="stat-card"><div class="num">{{ stats.titulares }}</div><div class="label">Titulares de Dados</div></div>
+  <div class="stat-card"><div class="num">{{ stats.planos_acao }}</div><div class="label">Planos de Acao</div></div>
+</div>
+
+<div class="card" style="margin-top:24px;">
+  <h3>Bem-vindo ao LGPD Manager</h3>
+  <p style="color:var(--muted)">Use o menu lateral para cadastrar departamentos, processos, mapeamentos de
+  dados (ROPA), riscos e terceiros. O <strong>Assistente de IA</strong> pode ajudar a preencher os
+  campos corretamente e sugerir base legal, classificacao de dados sensiveis e planos de acao.</p>
+  <a class="btn" href="/assistente">Abrir Assistente de IA</a>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Plano de Acao - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Plano de Acao</h2>{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Novo item do plano de acao</h3>
+  <form method="post" action="/plano-acao/novo">
+    <label>Titulo</label>
+    <input type="text" name="titulo" required>
+    <label>Descricao</label>
+    <textarea name="descricao" rows="2"></textarea>
+    <label>Responsavel</label>
+    <input type="text" name="responsavel">
+    <label>Risco relacionado</label>
+    <select name="risco_id">
+      <option value="">-- nenhum --</option>
+      {% for r in riscos %}
+      <option value="{{ r.id }}">{{ r.titulo }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn" type="submit">Salvar</button>
+  </form>
+</div>
+<div class="card">
+  <h3>Itens cadastrados</h3>
+  <table>
+    <tr><th>ID</th><th>Titulo</th><th>Responsavel</th><th>Status</th></tr>
+    {% for p in itens %}
+    <tr>
+      <td>{{ p.id }}</td>
+      <td>{{ p.titulo }}</td>
+      <td>{{ p.responsavel or "-" }}</td>
+      <td>{{ p.status }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" style="color:var(--muted)">Nenhum item cadastrado.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

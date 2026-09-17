@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}LGPD Manager{% endblock %}</title>
+<style>
+  :root {
+    --primary: #1e8e5a;
+    --primary-dark: #146b43;
+    --bg: #f4f6f8;
+    --card-bg: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  .layout { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 240px;
+    background: #16241f;
+    color: #d1d5db;
+    padding: 20px 0;
+    flex-shrink: 0;
+  }
+  .sidebar .brand {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    padding: 0 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 10px;
+  }
+  .sidebar a {
+    display: block;
+    padding: 10px 20px;
+    color: #d1d5db;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  .sidebar a:hover, .sidebar a.active {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+  }
+  .sidebar .section-title {
+    padding: 14px 20px 6px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6b7280;
+  }
+  .main { flex: 1; display: flex; flex-direction: column; }
+  .topbar {
+    background: var(--card-bg);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .content { padding: 24px; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  h1, h2, h3 { margin-top: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+  .btn {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    padding: 9px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--primary-dark); }
+  input, select, textarea {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-family: inherit;
+  }
+  label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 4px; }
+  .grid-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+  .stat-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 700; color: var(--primary); }
+  .stat-card .label { font-size: 13px; color: var(--muted); }
+  .badge { padding: 3px 8px; border-radius: 999px; font-size: 12px; }
+  .badge-baixo { background: #d1fae5; color: #065f46; }
+  .badge-medio { background: #fef3c7; color: #92400e; }
+  .badge-alto { background: #fee2e2; color: #991b1b; }
+</style>
+</head>
+<body>
+<div class="layout">
+  {% if user %}
+  <div class="sidebar">
+    <div class="brand">LGPD Manager</div>
+    <a href="/">Dashboard</a>
+    <div class="section-title">Cadastros</div>
+    <a href="/departamentos">Departamentos</a>
+    <a href="/processos">Processos</a>
+    <div class="section-title">Conformidade LGPD</div>
+    <a href="/mapeamentos">Mapeamento de Dados (ROPA)</a>
+    <a href="/riscos">Riscos</a>
+    <a href="/terceiros">Terceiros</a>
+    <a href="/plano-acao">Plano de Acao</a>
+    <div class="section-title">Assistente</div>
+    <a href="/assistente">Assistente de IA</a>
+    <a href="/configuracoes-ia">Configuracoes de IA</a>
+    <div class="section-title">Conta</div>
+    <a href="/logout">Sair</a>
+  </div>
+  {% endif %}
+  <div class="main">
+    {% if user %}
+    <div class="topbar">
+      <div>{% block header %}{% endblock %}</div>
+      <div style="font-size:14px;color:var(--muted)">{{ user.nome }} ({{ user.email }})</div>
+    </div>
+    {% endif %}
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+</body>
+</html>

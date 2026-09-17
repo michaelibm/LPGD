@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Configuracoes de IA - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Configuracoes de IA</h2>{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Provedor de IA do Assistente</h3>
+  <p style="color:var(--muted);font-size:13px;">
+    Cole aqui a chave de API do provedor de sua preferencia. A chave fica <strong>criptografada</strong>
+    no banco de dados local e nunca e exibida novamente apos salva.
+  </p>
+
+  {% if request.query_params.get('salvo') %}
+    <div style="background:#d1fae5;color:#065f46;padding:10px 12px;border-radius:6px;margin-bottom:16px;font-size:13px;">
+      Configuracao salva com sucesso!
+    </div>
+  {% endif %}
+
+  {% if config %}
+    <div style="background:#eef2ff;padding:10px 12px;border-radius:6px;margin-bottom:16px;font-size:13px;">
+      Provedor ativo: <strong>{{ config.provedor }}</strong>
+      {% if config.modelo %} &middot; Modelo: <strong>{{ config.modelo }}</strong>{% endif %}
+      &middot; Atualizado em {{ config.atualizado_em.strftime('%d/%m/%Y %H:%M') if config.atualizado_em else '-' }}
+    </div>
+  {% else %}
+    <div style="background:#fef3c7;color:#92400e;padding:10px 12px;border-radius:6px;margin-bottom:16px;font-size:13px;">
+      Nenhum provedor configurado ainda. O Assistente de IA nao vai funcionar ate voce salvar uma chave.
+    </div>
+  {% endif %}
+
+  <form method="post" action="/configuracoes-ia">
+    <label>Provedor</label>
+    <select name="provedor" id="provedor" onchange="atualizarCampos()">
+      <option value="anthropic">Anthropic (Claude)</option>
+      <option value="openai">OpenAI (GPT)</option>
+      <option value="deepseek">DeepSeek</option>
+      <option value="glm">GLM / Zhipu (BigModel)</option>
+      <option value="kimi">Kimi (Moonshot)</option>
+      <option value="outro">Outro compativel com API OpenAI</option>
+    </select>
+
+    <label>API Key</label>
+    <input type="password" name="api_key" placeholder="Cole sua chave de API aqui" required>
+
+    <label>Modelo (opcional - deixe em branco para usar o padrao)</label>
+    <input type="text" name="modelo" id="modelo" placeholder="Ex: claude-sonnet-4-5, gpt-4o-mini, deepseek-chat">
+
+    <label id="label-base-url" style="display:none;">Base URL (obrigatorio para "Outro")</label>
+    <input type="text" name="base_url" id="base_url" style="display:none;" placeholder="Ex: https://api.exemplo.com/v1">
+
+    <button class="btn" type="submit">Salvar configuracao</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Onde conseguir a chave</h3>
+  <ul style="font-size:13px;color:var(--muted);">
+    <li><strong>Anthropic:</strong> console.anthropic.com &rarr; API Keys</li>
+    <li><strong>OpenAI:</strong> platform.openai.com &rarr; API Keys</li>
+    <li><strong>DeepSeek:</strong> platform.deepseek.com &rarr; API Keys</li>
+    <li><strong>GLM/Zhipu:</strong> open.bigmodel.cn &rarr; API Keys</li>
+    <li><strong>Kimi:</strong> platform.moonshot.cn &rarr; API Keys</li>
+  </ul>
+</div>
+
+<script>
+function atualizarCampos() {
+  const provedor = document.getElementById('provedor').value;
+  const baseUrlLabel = document.getElementById('label-base-url');
+  const baseUrlInput = document.getElementById('base_url');
+  if (provedor === 'outro') {
+    baseUrlLabel.style.display = 'block';
+    baseUrlInput.style.display = 'block';
+    baseUrlInput.required = true;
+  } else {
+    baseUrlLabel.style.display = 'none';
+    baseUrlInput.style.display = 'none';
+    baseUrlInput.required = false;
+  }
+}
+atualizarCampos();
+</script>
+{% endblock %}

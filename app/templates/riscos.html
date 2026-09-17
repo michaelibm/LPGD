@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Riscos - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Riscos</h2>{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Novo risco</h3>
+  <form method="post" action="/riscos/novo">
+    <label>Titulo</label>
+    <input type="text" name="titulo" required>
+    <label>Descricao</label>
+    <textarea name="descricao" rows="2"></textarea>
+    <label>Probabilidade</label>
+    <select name="probabilidade">
+      <option>Baixa</option><option>Media</option><option>Alta</option>
+    </select>
+    <label>Impacto</label>
+    <select name="impacto">
+      <option>Baixo</option><option>Medio</option><option>Alto</option>
+    </select>
+    <button class="btn" type="submit">Salvar</button>
+  </form>
+</div>
+<div class="card">
+  <h3>Riscos cadastrados</h3>
+  <table>
+    <tr><th>ID</th><th>Titulo</th><th>Probabilidade</th><th>Impacto</th><th>Nivel</th><th>Status</th></tr>
+    {% for r in itens %}
+    <tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.titulo }}</td>
+      <td>{{ r.probabilidade }}</td>
+      <td>{{ r.impacto }}</td>
+      <td>
+        {% if r.nivel_risco == "Alto" %}<span class="badge badge-alto">Alto</span>
+        {% elif r.nivel_risco == "Medio" %}<span class="badge badge-medio">Medio</span>
+        {% else %}<span class="badge badge-baixo">Baixo</span>{% endif %}
+      </td>
+      <td>{{ r.status }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6" style="color:var(--muted)">Nenhum risco cadastrado.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
