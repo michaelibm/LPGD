@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Formulario Geral - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Formulario Geral - {{ empresa.nome }}</h2>{% endblock %}
+{% block content %}
+
+{% if request.query_params.get('salvo') %}
+<div style="background:#d1fae5;color:#065f46;padding:10px 12px;border-radius:6px;margin-bottom:16px;font-size:13px;">
+  Respostas salvas com sucesso!
+</div>
+{% endif %}
+
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <div>
+      <label>Empresa</label>
+      <div style="font-weight:600;">{{ empresa.nome }}</div>
+    </div>
+    <div style="text-align:right;">
+      <label>Percentual de adequacao</label>
+      <div style="font-size:28px;font-weight:700;color:{{ 'var(--primary)' if percentual >= 70 else ('#92400e' if percentual >= 40 else '#991b1b') }};">
+        {{ percentual }}%
+      </div>
+    </div>
+  </div>
+  <div style="background:#e5e7eb;border-radius:8px;height:10px;overflow:hidden;">
+    <div style="background:{{ 'var(--primary)' if percentual >= 70 else ('#f59e0b' if percentual >= 40 else '#ef4444') }};height:100%;width:{{ percentual }}%;"></div>
+  </div>
+  <p style="color:#991b1b;font-size:13px;margin-top:10px;">
+    <strong>Atencao!</strong> Responda todas as questoes destacadas em vermelho (pendentes) para uma real % de adequacao.
+  </p>
+</div>
+
+<form method="post" action="/empresas/{{ empresa.id }}/formulario-geral">
+  {% for p in perguntas %}
+  {% set resp = respostas_map.get(p.numero) %}
+  <div class="card">
+    <label>
+      {% if not resp %}<span style="color:#dc2626;font-weight:700;">{{ p.numero }}.</span>
+      {% else %}<span style="font-weight:700;">{{ p.numero }}.</span>{% endif %}
+      <strong>{{ p.texto }}</strong>
+    </label>
+    <select name="Q_{{ p.numero }}">
+      <option value="" {% if not resp %}selected{% endif %}>SELECIONAR</option>
+      <option value="S" {% if resp == "S" %}selected{% endif %}>SIM</option>
+      <option value="N" {% if resp == "N" %}selected{% endif %}>NAO</option>
+      <option value="0" {% if resp == "0" %}selected{% endif %}>NAO SE APLICA</option>
+    </select>
+    {% if p.ajuda %}
+    <p style="font-size:12px;color:var(--muted);margin-top:-6px;">
+      <em>Ajuda: {{ p.ajuda }}</em>
+    </p>
+    {% endif %}
+    <label>Observacoes sobre esta questao</label>
+    <textarea name="obs_{{ p.numero }}" rows="2" maxlength="5000">{{ observacoes_map.get(p.numero) or "" }}</textarea>
+  </div>
+  {% endfor %}
+
+  <button class="btn" type="submit" style="font-size:16px;padding:12px 24px;">Salvar formulario geral</button>
+</form>
+
+{% endblock %}

@@ -14,6 +14,7 @@ from app.database import init_db, get_db
 from app import models
 from app.auth import hash_senha, verificar_senha, criar_token_sessao, ler_token_sessao
 from app import ai_assistant
+from app.formgeral_data import PERGUNTAS_FORMGERAL
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -438,3 +439,150 @@ def configuracoes_ia_salvar(
     db.commit()
 
     return RedirectResponse(url="/configuracoes-ia?salvo=1", status_code=303)
+
+
+# ---------- EMPRESAS ----------
+
+@app.get("/empresas", response_class=HTMLResponse)
+def listar_empresas(request: Request, db: Session = Depends(get_db)):
+    user = usuario_atual(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    itens = db.query(models.Empresa).order_by(models.Empresa.id.desc()).all()
+    return templates.TemplateResponse(request, "empresas.html", {"user": user, "itens": itens})
+
+
+@app.post("/empresas/novo")
+def criar_empresa(
+    request: Request,
+    nome: str = Form(...),
+    cpf_cnpj: str = Form(""),
+    telefone: str = Form(""),
+    email: str = Form(""),
+    cep: str = Form(""),
+    observacoes: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    user = usuario_atual(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    e = models.Empresa(
+        nome=nome, cpf_cnpj=cpf_cnpj, telefone=telefone, email=email,
+        cep=cep, observacoes=observacoes, status=True,
+    )
+    db.add(e)
+    db.commit()
+    return RedirectResponse(url="/empresas", status_code=303)
+
+
+@app.post("/empresas/{empresa_id}/editar")
+def editar_empresa(
+    request: Request,
+    empresa_id: int,
+    nome: str = Form(...),
+    telefone: str = Form(""),
+    email: str = Form(""),
+    cep: str = Form(""),
+    status: str = Form(""),
+    observacoes: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    user = usuario_atual(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    e = db.query(models.Empresa).filter(models.Empresa.id == empresa_id).first()
+    if e:
+        e.nome = nome
+        e.telefone = telefone
+        e.email = email
+        e.cep = cep
+        e.status = (status == "1")
+        e.observacoes = observacoes
+        db.commit()
+    return RedirectResponse(url="/empresas", status_code=303)
+
+
+# ---------- FORMULARIO GERAL (questionario de diagnostico LGPD) ----------
+
+def calcular_percentual_adequacao(respostas_map: dict) -> int:
+    """Percentual de perguntas respondidas com SIM sobre o total aplicavel (exclui NAO SE APLICA e pendentes)."""
+    total_aplicavel = 0
+    total_sim = 0
+    for p in PERGUNTAS_FORMGERAL:
+        resp = respostas_map.get(p["numero"])
+        if resp in ("S", "N"):
+            total_aplicavel += 1
+            if resp == "S":
+                total_sim += 1
+    if total_aplicavel == 0:
+        return 0
+    return round((total_sim / total_aplicavel) * 100)
+
+
+@app.get("/empresas/{empresa_id}/formulario-geral", response_class=HTMLResponse)
+def formulario_geral_page(request: Request, empresa_id: int, db: Session = Depends(get_db)):
+    user = usuario_atual(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+    empresa = db.query(models.Empresa).filter(models.Empresa.id == empresa_id).first()
+    if not empresa:
+        return RedirectResponse(url="/empresas", status_code=303)
+
+    respostas = (
+        db.query(models.FormularioGeralResposta)
+        .filter(models.FormularioGeralResposta.empresa_id == empresa_id)
+        .all()
+    )
+    respostas_map = {r.pergunta_id: r.resposta for r in respostas}
+    observacoes_map = {r.pergunta_id: r.observacao for r in respostas}
+    percentual = calcular_percentual_adequacao(respostas_map)
+
+    return templates.TemplateResponse(
+        request,
+        "formulario_geral.html",
+        {
+            "user": user,
+            "empresa": empresa,
+            "perguntas": PERGUNTAS_FORMGERAL,
+            "respostas_map": respostas_map,
+            "observacoes_map": observacoes_map,
+            "percentual": percentual,
+        },
+    )
+
+
+@app.post("/empresas/{empresa_id}/formulario-geral")
+async def formulario_geral_salvar(request: Request, empresa_id: int, db: Session = Depends(get_db)):
+    user = usuario_atual(request, db)
+    if not user:
+        return RedirectResponse(url="/login", status_code=303)
+
+    form = await request.form()
+
+    for p in PERGUNTAS_FORMGERAL:
+        numero = p["numero"]
+        resposta_valor = form.get(f"Q_{numero}") or None
+        observacao_valor = form.get(f"obs_{numero}") or None
+
+        existente = (
+            db.query(models.FormularioGeralResposta)
+            .filter(
+                models.FormularioGeralResposta.empresa_id == empresa_id,
+                models.FormularioGeralResposta.pergunta_id == numero,
+            )
+            .first()
+        )
+        if existente:
+            existente.resposta = resposta_valor
+            existente.observacao = observacao_valor
+        else:
+            nova_resposta = models.FormularioGeralResposta(
+                empresa_id=empresa_id,
+                pergunta_id=numero,
+                resposta=resposta_valor,
+                observacao=observacao_valor,
+            )
+            db.add(nova_resposta)
+
+    db.commit()
+    return RedirectResponse(url=f"/empresas/{empresa_id}/formulario-geral?salvo=1", status_code=303)

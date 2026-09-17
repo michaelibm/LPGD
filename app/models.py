@@ -21,6 +21,31 @@ class Usuario(Base):
     criado_em = Column(DateTime, default=datetime.utcnow)
 
 
+class Empresa(Base):
+    """Empresa/cliente do sistema (equivalente a 'Cadastro > Empresas' do site original)."""
+    __tablename__ = "empresas"
+    id = Column(Integer, primary_key=True)
+    nome = Column(String(150), nullable=False)
+    cpf_cnpj = Column(String(20))
+    telefone = Column(String(20))
+    email = Column(String(60))
+    cep = Column(String(9))
+    status = Column(Boolean, default=True)  # True = ATIVO
+    observacoes = Column(Text)
+    criado_em = Column(DateTime, default=datetime.utcnow)
+
+
+class FormularioGeralResposta(Base):
+    """Resposta individual de uma pergunta do Formulario Geral (questionario LGPD)."""
+    __tablename__ = "formgeral_respostas"
+    id = Column(Integer, primary_key=True)
+    empresa_id = Column(Integer, ForeignKey("empresas.id"), nullable=False)
+    pergunta_id = Column(Integer, nullable=False)  # numero fixo da pergunta (1 a 32)
+    resposta = Column(String(1))  # S, N, 0 (nao se aplica) ou None (pendente)
+    observacao = Column(Text)
+    atualizado_em = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 class Departamento(Base):
     __tablename__ = "departamentos"
     id = Column(Integer, primary_key=True)

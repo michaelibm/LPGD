@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Empresas - LGPD Manager{% endblock %}
+{% block header %}<h2 style="margin:0;font-size:18px;">Empresas</h2>{% endblock %}
+{% block content %}
+<div class="card">
+  <h3>Nova empresa</h3>
+  <form method="post" action="/empresas/novo">
+    <label>Nome *</label>
+    <input type="text" name="nome" maxlength="150" required>
+    <label>CPF/CNPJ</label>
+    <input type="text" name="cpf_cnpj" maxlength="18">
+    <label>Telefone *<small style="color:var(--muted)"> (ex: 51-999999999)</small></label>
+    <input type="text" name="telefone" maxlength="20" required>
+    <label>E-mail *</label>
+    <input type="email" name="email" maxlength="60" required>
+    <label>CEP *</label>
+    <input type="text" name="cep" maxlength="9" required>
+    <label>Observacoes</label>
+    <textarea name="observacoes" rows="2"></textarea>
+    <button class="btn" type="submit">Salvar empresa</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Empresas cadastradas</h3>
+  <table>
+    <tr><th>Nome</th><th>Codigo</th><th>Status</th><th>Acoes</th></tr>
+    {% for e in itens %}
+    <tr>
+      <td><b>{{ e.nome }}</b></td>
+      <td>{{ e.id }}</td>
+      <td>
+        {% if e.status %}<span class="badge badge-baixo">ATIVO</span>
+        {% else %}<span class="badge badge-alto">INATIVO</span>{% endif %}
+      </td>
+      <td>
+        <a class="btn" style="padding:5px 10px;font-size:12px;" href="/empresas/{{ e.id }}/formulario-geral">FORM. GERAL</a>
+      </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="4" style="color:var(--muted)">Nenhuma empresa cadastrada.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}
