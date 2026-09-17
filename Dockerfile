@@ -12,6 +12,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app ./app
 
+# Garante que a pasta static existe mesmo se vazia (pastas vazias nao sao versionadas no git)
+RUN mkdir -p /app/app/static
+
 # Volume para persistir banco de dados e chave de criptografia
 VOLUME ["/app/data"]
 
